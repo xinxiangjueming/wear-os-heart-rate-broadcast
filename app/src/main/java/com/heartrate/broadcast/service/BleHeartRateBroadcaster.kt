@@ -403,6 +403,7 @@ class BleHeartRateBroadcaster(private val context: Context) {
                 subscribedDevices.add(device)
                 android.util.Log.d("BLE", "设备已连接: ${device.address}，自动订阅通知")
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+                restartAdvertising()
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 connectedDevices.remove(device)
                 subscribedDevices.remove(device)
