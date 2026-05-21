@@ -39,7 +39,7 @@ class BleHeartRateBroadcaster(private val context: Context) {
         // Flags: bit0=0 (UINT8), bit1-2=11 (sensor contact supported+detected), bit3=0, bit4=0
         private const val HR_FLAGS: Byte = 0x06
         private const val BODY_SENSOR_LOCATION: Byte = 0x01  // Chest
-        private const val BLE_SHORT_NAME = "Watch-BLE"
+        // BLE_SHORT_NAME 已移除，改用 Build.BRAND + Build.MODEL 动态获取
     }
 
     private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -314,14 +314,15 @@ class BleHeartRateBroadcaster(private val context: Context) {
             .setTimeout(0)
             .build()
 
-        bluetoothAdapter?.name = BLE_SHORT_NAME
+        val bleName = Build.MODEL
+        bluetoothAdapter?.name = bleName
 
         val data = AdvertiseData.Builder()
             .addServiceUuid(ParcelUuid(HEART_RATE_SERVICE_UUID))
             .setIncludeDeviceName(true)
             .build()
 
-        android.util.Log.d("BLE", "开始广播，设备名: $BLE_SHORT_NAME")
+        android.util.Log.d("BLE", "开始广播，设备名: $bleName")
 
         advertiseCallback = object : AdvertiseCallback() {
             override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
