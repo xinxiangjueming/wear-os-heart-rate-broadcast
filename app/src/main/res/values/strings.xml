@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Heart Rate Broadcast</string>
+    <string name="title_heart_rate_broadcast">Heart Rate Broadcast</string>
+    <string name="status_broadcasting">Broadcasting</string>
+    <string name="label_heart_rate">Heart Rate bpm</string>
+    <string name="label_battery">Battery</string>
+    <string name="btn_start">Start</string>
+    <string name="btn_stop">Stop</string>
+    <string name="hint_waiting_connect">🟢 Broadcasting – Waiting for connection…</string>
+    <string name="hint_click_start">Tap to start broadcasting</string>
+    <string name="permission_title">Heart Rate Broadcast</string>
+    <string name="permission_desc">Bluetooth &amp; notification permissions required</string>
+    <string name="permission_grant">Grant</string>
+    <string name="notification_channel_name">Heart Rate Broadcast Service</string>
+    <string name="notification_broadcasting">Broadcasting heart rate data</string>
+    <string name="notification_title">Broadcasting Heart Rate</string>
+    <string name="notification_text">Heart rate: %1$d bpm | Battery: %2$d%%</string>
+</resources>

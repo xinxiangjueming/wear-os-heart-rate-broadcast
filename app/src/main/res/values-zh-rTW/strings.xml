@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">心率廣播</string>
+    <string name="title_heart_rate_broadcast">心率廣播</string>
+    <string name="status_broadcasting">廣播中</string>
+    <string name="label_heart_rate">心率 bpm</string>
+    <string name="label_battery">電量</string>
+    <string name="btn_start">開始</string>
+    <string name="btn_stop">停止</string>
+    <string name="hint_waiting_connect">🟢 廣播中 - 等待連線…</string>
+    <string name="hint_click_start">點擊開始廣播心率</string>
+    <string name="permission_title">心率廣播</string>
+    <string name="permission_desc">需要藍牙和通知權限</string>
+    <string name="permission_grant">授權</string>
+    <string name="notification_channel_name">心率廣播服務</string>
+    <string name="notification_broadcasting">正在廣播心率資料</string>
+    <string name="notification_title">心率廣播中</string>
+    <string name="notification_text">心率: %1$d bpm | 電量: %2$d%%</string>
+</resources>
