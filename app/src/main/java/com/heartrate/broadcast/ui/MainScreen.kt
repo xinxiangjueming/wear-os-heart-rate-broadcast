@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,7 +63,8 @@ fun MainScreen() {
                 if (isBroadcasting) {
                     Text(
                         text = stringResource(R.string.status_broadcasting),
-                        style = MaterialTheme.typography.caption1,
+                        style = MaterialTheme.typography.title3,
+                        fontWeight = FontWeight.Bold,
                         color = Color(0xFFFFEB3B)
                     )
                 } else {
@@ -86,7 +88,9 @@ fun MainScreen() {
                         text = if (isBroadcasting && heartRate > 0) "$heartRate" else "--",
                         fontSize = 36.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFE53935)
+                        color = Color(0xFFE53935),
+                        modifier = Modifier.width(80.dp),
+                        textAlign = TextAlign.Center
                     )
                     Text(
                         text = stringResource(R.string.label_heart_rate),
@@ -101,15 +105,14 @@ fun MainScreen() {
                             withStyle(style = SpanStyle(color = Color(0xFF2E7D32))) {
                                 append("$batteryLevel")
                             }
-                            withStyle(style = SpanStyle(color = Color.White)) {
-                                append("%")
-                            }
                         },
                         fontSize = 36.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.width(80.dp),
+                        textAlign = TextAlign.Center
                     )
                     Text(
-                        text = stringResource(R.string.label_battery),
+                        text = stringResource(R.string.label_battery) + "%",
                         style = MaterialTheme.typography.caption2,
                         color = Color.White
                     )
