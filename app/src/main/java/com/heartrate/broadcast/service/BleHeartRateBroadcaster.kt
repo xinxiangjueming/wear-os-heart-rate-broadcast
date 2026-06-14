@@ -85,11 +85,11 @@ class BleHeartRateBroadcaster(private val context: Context) {
         }
     }
 
-    // 节流
-    private var lastNotifyTime = 0L
-    private var lastNotifiedBpm = 0
-    private var lastNotifiedBattery = -1
-    private var lastSentBattery = -2
+    // 节流（@Volatile: 主线程和 BLE 线程均可访问）
+    @Volatile private var lastNotifyTime = 0L
+    @Volatile private var lastNotifiedBpm = 0
+    @Volatile private var lastNotifiedBattery = -1
+    @Volatile private var lastSentBattery = -2
 
     // 拥塞控制
     private val retryingDevices: MutableSet<BluetoothDevice> =
@@ -195,7 +195,9 @@ class BleHeartRateBroadcaster(private val context: Context) {
         val batChar = batteryCharacteristic
         if (server == null || hrChar == null || batChar == null) return
 
-        for (device in subscribedDevices) {
+        // 快照：避免迭代期间其他线程修改 subscribedDevices 导致 ConcurrentModificationException
+        val snapshot = subscribedDevices.toList()
+        for (device in snapshot) {
             if (device in congestedDevices) {
                 android.util.Log.d("BLE", "跳过拥塞设备: ${device.address}")
                 continue

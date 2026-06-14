@@ -49,11 +49,11 @@ class HeartRateBroadcastService : Service() {
     private var wakeLock: PowerManager.WakeLock? = null
     private var currentHeartRate = 0
     private var isMonitoring = false
-    private var isStopping = false  // 防止重复 stop
+    @Volatile private var isStopping = false  // 防止重复 stop，跨线程可见性
 
-    // 通知节流：仅数值变化时更新
-    private var lastNotifiedHeartRate = -1
-    private var lastNotifiedBattery = -1
+    // 通知节流：仅数值变化时更新（可从多线程访问）
+    @Volatile private var lastNotifiedHeartRate = -1
+    @Volatile private var lastNotifiedBattery = -1
     // 心跳监控：记录最后一次收到心率数据的时间
     @Volatile
     private var lastDataReceivedTime = 0L
@@ -64,30 +64,34 @@ class HeartRateBroadcastService : Service() {
         }
 
         override fun onDataReceived(data: DataPointContainer) {
-            lastDataReceivedTime = System.currentTimeMillis()
-            val heartRatePoints = data.getData(DataType.HEART_RATE_BPM)
-            for (point in heartRatePoints) {
-                val bpm = point.value.toInt()
-                if (bpm <= 0) {
-                    android.util.Log.d("HealthService", "心率无效: $bpm，跳过")
-                    return
-                }
-                currentHeartRate = bpm
-                android.util.Log.d("HealthService", "心率: $bpm bpm")
+            // Health Services 回调默认在主线程派发，
+            // 切到 serviceScope (Dispatchers.Default) 避免主线程执行 BLE 操作
+            serviceScope.launch {
+                lastDataReceivedTime = System.currentTimeMillis()
+                val heartRatePoints = data.getData(DataType.HEART_RATE_BPM)
+                for (point in heartRatePoints) {
+                    val bpm = point.value.toInt()
+                    if (bpm <= 0) {
+                        android.util.Log.d("HealthService", "心率无效: $bpm，跳过")
+                        return@launch
+                    }
+                    currentHeartRate = bpm
+                    android.util.Log.d("HealthService", "心率: $bpm bpm")
 
-                // 同步到共享数据桥梁，UI 会自动更新
-                HeartRateDataHolder.updateHeartRate(bpm)
+                    // 同步到共享数据桥梁，UI 会自动更新
+                    HeartRateDataHolder.updateHeartRate(bpm)
 
-                // 更新 BLE 广播数据
-                val battery = getBatteryLevel()
-                HeartRateDataHolder.updateBatteryLevel(battery)
-                bleBroadcaster?.updateHeartRate(bpm, battery)
+                    // 更新 BLE 广播数据
+                    val battery = getBatteryLevel()
+                    HeartRateDataHolder.updateBatteryLevel(battery)
+                    bleBroadcaster?.updateHeartRate(bpm, battery)
 
-                // 仅数值变化时更新通知
-                if (bpm != lastNotifiedHeartRate || battery != lastNotifiedBattery) {
-                    lastNotifiedHeartRate = bpm
-                    lastNotifiedBattery = battery
-                    updateNotification(bpm, battery)
+                    // 仅数值变化时更新通知
+                    if (bpm != lastNotifiedHeartRate || battery != lastNotifiedBattery) {
+                        lastNotifiedHeartRate = bpm
+                        lastNotifiedBattery = battery
+                        updateNotification(bpm, battery)
+                    }
                 }
             }
         }
