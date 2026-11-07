@@ -16,4 +16,10 @@
     <string name="notification_broadcasting">正在廣播心率資料</string>
     <string name="notification_title">心率廣播中</string>
     <string name="notification_text">心率: %1$d bpm | 電量: %2$d%%</string>
+
+    <!-- 1:2:1 數據頁標籤（對齊 sportlinkwear 心率廣播介面） -->
+    <string name="label_elapsed">運動時間</string>
+    <string name="label_bpm">心率 bpm</string>
+    <string name="label_battery_pct">電量 %</string>
+    <string name="label_connected">已連線</string>
 </resources>

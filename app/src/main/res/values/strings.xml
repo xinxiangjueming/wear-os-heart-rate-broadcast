@@ -16,4 +16,10 @@
     <string name="notification_broadcasting">Broadcasting heart rate data</string>
     <string name="notification_title">Broadcasting Heart Rate</string>
     <string name="notification_text">Heart rate: %1$d bpm | Battery: %2$d%%</string>
+
+    <!-- 1:2:1 数据页标签（对齐 sportlinkwear 心率广播界面） -->
+    <string name="label_elapsed">Elapsed</string>
+    <string name="label_bpm">bpm</string>
+    <string name="label_battery_pct">Battery %</string>
+    <string name="label_connected">Connected</string>
 </resources>

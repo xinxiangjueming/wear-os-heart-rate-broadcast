@@ -146,6 +146,8 @@ class HeartRateBroadcastService : Service() {
 
         // BLE 启动成功后才通知 UI
         HeartRateDataHolder.setBroadcasting(true)
+        HeartRateDataHolder.setStartedAtMs(System.currentTimeMillis())
+        HeartRateDataHolder.updateConnectedCount(0)
         HeartRateDataHolder.updateBatteryLevel(getBatteryLevel())
 
         // 初始化 Health Services

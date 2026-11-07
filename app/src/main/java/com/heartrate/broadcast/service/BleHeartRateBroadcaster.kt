@@ -157,6 +157,7 @@ class BleHeartRateBroadcaster(private val context: Context) {
         subscribedDevices.clear()
         congestedDevices.clear()
         retryingDevices.clear()
+        HeartRateDataHolder.updateConnectedCount(0)
     }
 
     fun getSubscribedDeviceCount(): Int = subscribedDevices.size
@@ -401,9 +402,11 @@ class BleHeartRateBroadcaster(private val context: Context) {
         override fun onConnectionStateChange(device: BluetoothDevice, status: Int, newState: Int) {
             android.util.Log.d("BLE", "onConnectionStateChange: ${device.address}, status=$status, newState=$newState, gattReady=$gattReady")
             if (newState == BluetoothProfile.STATE_CONNECTED) {
+                // 按 sportlinkwear 修复口径：连入 GATT Server ≠ 已订阅心率通知。
+                // 界面「已连接」只统计写了 CCCD 开启 notify 的设备（见 onDescriptorWriteRequest），
+                // 连入本身不改变计数；connectedDevices 仅用于链路诊断。
                 connectedDevices.add(device)
-                subscribedDevices.add(device)
-                android.util.Log.d("BLE", "设备已连接: ${device.address}，自动订阅通知")
+                android.util.Log.d("BLE", "设备已连接: ${device.address}，等待 CCCD 订阅")
                 vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
                 restartAdvertising()
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
@@ -411,7 +414,9 @@ class BleHeartRateBroadcaster(private val context: Context) {
                 subscribedDevices.remove(device)
                 congestedDevices.remove(device)
                 retryingDevices.remove(device)
-                android.util.Log.d("BLE", "设备已断开: ${device.address}，剩余: ${connectedDevices.size}")
+                // 断链会移除订阅，计数随 subscribedDevices 自动减一（与 wear 端口径一致）
+                HeartRateDataHolder.updateConnectedCount(subscribedDevices.size)
+                android.util.Log.d("BLE", "设备已断开: ${device.address}，链路剩余: ${connectedDevices.size}，订阅剩余: ${subscribedDevices.size}")
                 vibrator.vibrate(VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE))
             }
         }
@@ -478,6 +483,9 @@ class BleHeartRateBroadcaster(private val context: Context) {
                     }
                     return
                 }
+
+                // 界面「已连接」= 实际订阅心率通知的设备数（CCCD 开关时随集合派生）
+                HeartRateDataHolder.updateConnectedCount(subscribedDevices.size)
 
                 if (responseNeeded) {
                     try {
