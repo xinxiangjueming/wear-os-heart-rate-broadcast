@@ -19,7 +19,10 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // 开启 R8 代码裁剪/混淆/优化：未裁剪时 dex 占 APK 约 97%（约 23MB）。
+            // proguard-rules.pro 中的 @Composable / Health Services / Bluetooth / coroutines
+            // keep 规则自此才真正生效（2026-11-07 用户要求）。
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
